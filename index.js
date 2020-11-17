@@ -1,13 +1,19 @@
-const config = require("./config");
 const Twit = require("twit");
+const fs = require("fs");
+const path = require("path");
+const config = require(path.join(__dirname, "config.js"));
 
 const T = new Twit(config);
 
-T.get("account/verify_credentials", {
+T.get(
+  "account/verify_credentials",
+  {
     include_entities: false,
     skip_status: true,
     include_email: false,
-  }, onAuthenticated);
+  },
+  onAuthenticated
+);
 
 function onAuthenticated(err, res) {
   if (err) {
@@ -15,30 +21,58 @@ function onAuthenticated(err, res) {
   }
   console.log("auth successful. running bot");
 
-  var b64content = fs.readFileSync('/path/to/img', { encoding: 'base64' })
- 
+  function randomImageArr(images) {
+    return images[Math.floor(Math.random() * images.length)];
+  }
 
+  function tweetImage() {
+    fs.readdir(__dirname + "/imgs/", function (err, files) {
+      if (err) {
+        console.log("error: ", err);
+      } else {
+        let images = [];
+        files.forEach(function (f) {
+          images.push(f);
+        });
+        console.log("opening image");
 
-// first we must post the media to Twitter
-T.post('media/upload', { media_data: b64content }, function (err, data, response) {
-  // now we can assign alt text to the media, for use by screen readers and
-  // other text-based presentations and interpreters
+        const imagePath = path.join(
+            __dirname,
+            "/imgs/" + randomImageArr(images)
+          ),
+          b64content = fs.readFileSync(imagePath, { encoding: "base64" });
 
-  var mediaIdStr = data.media_id_string
-  var altText = ""
-  var meta_params = { media_id: mediaIdStr, alt_text: { text: altText } }
- 
-  T.post('media/metadata/create', meta_params, function (err, data, response) {
-    if (!err) {
-      // now we can reference the media and post a tweet (media will attach to the tweet)
-      // include post name? and attribution from unsplash
-      var params = { status: '', media_ids: [mediaIdStr] }
- 
-      T.post('statuses/update', params, function (err, data, response) {
-        console.log(data)
-      })
-    }
-  })
-})
+        console.log("uploading image");
 
+        T.post("media/upload", { media_data: b64content }, function (
+          err,
+          data,
+          response
+        ) {
+          if (err) {
+            console.log("error: ", err);
+          } else {
+            console.log("image uploaded, tweeting it..");
+
+            T.post(
+              "statuses/update",
+              {
+                media_ids: new Array(data.media_id_string),
+              },
+              function (err, data, response) {
+                if (err) {
+                  console.log("error: ", err);
+                } else {
+                  console.log("posted image!");
+                }
+              }
+            );
+          }
+        });
+      }
+    });
+  }
+  setInterval( function(){
+    tweetImage();
+  }, 10000 );
 }

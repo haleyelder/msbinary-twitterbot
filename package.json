@@ -1,5 +1,5 @@
 {
-  "name": "MsBinary Galactic Image Twitter Bot",
+  "name": "twit-bot",
   "version": "1.0.0",
   "description": "Twitter by posting galaxy images to @MsBinary",
   "main": "index.js",

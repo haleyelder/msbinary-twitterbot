@@ -3,5 +3,4 @@ config.js
 node_modules
 package-lock.json
 debug.log
-imgs/resized
-imgs/resized.zip
+imgs.zip

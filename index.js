@@ -1,7 +1,7 @@
-const fs = require("fs"),
-  path = require("path"),
-  Twit = require("twit"),
-  config = require(path.join(__dirname, "config.js"));
+const fs = require("fs")
+const  path = require("path")
+const Twit = require("twit")
+const config = require('./config.js');
 
 const T = new Twit(config);
 

@@ -2,5 +2,5 @@ notes.txt
 config.js
 node_modules
 package-lock.json
-debug.log
+.env
 imgs.zip
